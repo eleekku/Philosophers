@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "philo.h"
-#include <stdio.h>
 
 int ft_atoi(const char *str)
 {
@@ -154,7 +153,8 @@ void	print_message(t_philo *philo, int i, unsigned int time)
 {	
 	unsigned int	timestamp;
 
-	if (philo->data->death == TRUE)
+	if (philo->data->death == TRUE || (philo->meals_eaten >= philo->data->meals 
+	&& philo->data->meals != 0))
 		return;
 	pthread_mutex_lock(&philo->data->print);
 	timestamp = get_time() - philo->data->start_time;
@@ -185,10 +185,6 @@ void	*eat(void *arg)
 	{
 	pthread_mutex_lock(&current->left_fork);
 	print_message(current, 1, 0);
-	//if (current->data->death == TRUE)
-		//pthread_mutex_unlock(&current->left_fork);
-	//if (current->data->death == TRUE)
-		//pthread_mutex_unlock(current->right_fork);
 	pthread_mutex_lock(current->right_fork);
 	print_message(current, 2, 0);
 	usleep(500);
