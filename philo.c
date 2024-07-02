@@ -126,7 +126,7 @@ void	seat_philosophers(t_maitred *maitre_d)
 		maitre_d->philo[i]->data = maitre_d;
 		pthread_mutex_init(&maitre_d->philo[i]->left_fork, NULL);
 		if (i > 0)
-		maitre_d->philo[i]->right_fork = &maitre_d->philo[i - 1]->left_fork;
+			maitre_d->philo[i]->right_fork = &maitre_d->philo[i - 1]->left_fork;
 		maitre_d->philo[i]->meals_eaten = 0;
 		maitre_d->philo[i]->last_meal = 0;
 		maitre_d->philo[i]->data = maitre_d;
