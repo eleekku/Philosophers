@@ -92,7 +92,10 @@ int check_arguments(int argc, char **argv)
 		if (i == 1)
 		{
 			if (ft_atoi(argv[i]) < 1)
+			{
 				write(2, "Must be at least one philosopher\n", 34);
+				return (1);
+			}
 		}
 	}
 	return (0);
@@ -124,7 +127,8 @@ void	seat_philosophers(t_maitred *maitre_d)
 				printf("error\n");
 		maitre_d->philo[i]->index = i + 1;
 		maitre_d->philo[i]->data = maitre_d;
-		pthread_mutex_init(&maitre_d->philo[i]->left_fork, NULL);
+		if (pthread_mutex_init(&maitre_d->philo[i]->left_fork, NULL) != 0)
+			printf("error\n");
 		if (i > 0)
 			maitre_d->philo[i]->right_fork = &maitre_d->philo[i - 1]->left_fork;
 		maitre_d->philo[i]->meals_eaten = 0;
@@ -156,8 +160,9 @@ void	print_message(t_philo *philo, int i, unsigned int time)
 	if (philo->data->death == TRUE || (philo->meals_eaten >= philo->data->meals 
 	&& philo->data->meals != 0))
 		return;
-	pthread_mutex_lock(&philo->data->print);
 	timestamp = get_time() - philo->data->start_time;
+	pthread_mutex_lock(&philo->data->print);
+//	timestamp = get_time() - philo->data->start_time;
 	if (i == 1 && philo->data->death == FALSE)
 		printf("%d philo %d has taken a left fork\n", timestamp, philo->index);
 	else if (i == 2 && philo->data->death == FALSE) 
@@ -193,10 +198,10 @@ void	*eat(void *arg)
 	current->last_meal = time;
 	time = (current->data->time_to_eat -(get_time() - current->data->start_time - time));
 	usleep(time * 1000);
-	current->meals_eaten++;
+	print_message(current, 4, 0);
 	pthread_mutex_unlock(&current->left_fork);
 	pthread_mutex_unlock(current->right_fork);
-	print_message(current, 4, 0);
+	current->meals_eaten++;
 	time = (current->data->time_to_sleep -(get_time() - current->data->start_time - time));
 	if (current->data->death == FALSE)
 		usleep(current->data->time_to_sleep * 1000);
@@ -235,7 +240,7 @@ void	*oversee(void *maitre_d)
 		{
 			pthread_mutex_lock(&m->print);
 			m->death = TRUE;
-			timestamp = get_time() - m->start_time - m->philo[i]->last_meal;
+			timestamp = get_time() - m->start_time; // - m->philo[i]->last_meal;
 			printf("%d philo %d died\n", timestamp, m->philo[i]->index);
 			pthread_mutex_unlock(&m->print);
 			i = -1;
@@ -253,10 +258,12 @@ void	start_dining(t_maitred *maitre_d)
 
 	maitre_d->start_time = get_time();
 	i = 0;
-	pthread_create(&maitre_d->maitre_d, NULL, &oversee, (t_maitred *)maitre_d);
+	if (pthread_create(&maitre_d->maitre_d, NULL, &oversee, (t_maitred *)maitre_d) != 0)
+		printf("error\n");
 	while (i < maitre_d->number_of_philos)
 	{
-		pthread_create(&maitre_d->philo[i]->philo, NULL, &routines, (t_philo *)maitre_d->philo[i]);
+		if (pthread_create(&maitre_d->philo[i]->philo, NULL, &routines, (t_philo *)maitre_d->philo[i]) != 0)
+			printf("error\n");
 		i++;
 	}	
 }
