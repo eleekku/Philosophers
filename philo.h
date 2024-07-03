@@ -31,6 +31,8 @@ typedef struct s_philo
 	pthread_t			philo;
 	pthread_mutex_t		left_fork;
 	pthread_mutex_t 	*right_fork;
+	pthread_mutex_t		mealtdata;
+	pthread_mutex_t		mealsdata;
 	int					index;
 	int					meals_eaten;
 	unsigned int		last_meal;
@@ -39,17 +41,32 @@ typedef struct s_philo
 
 typedef struct s_maitred
 {
-	int				time_to_die;
-	int				time_to_eat;
-	int				time_to_sleep;
-	int				number_of_philos;
-	int				meals;
+	unsigned int	time_to_die;
+	unsigned int	time_to_eat;
+	unsigned int	time_to_sleep;
 	unsigned int	start_time;
+	int				meals;
+	int				number_of_philos;
 	pthread_t		maitre_d;
 	t_bool			death;
 	t_bool			finish;
 	t_philo			**philo;
 	pthread_mutex_t	print;
+	pthread_mutex_t finishdata;
+	pthread_mutex_t	deathdata;
 }	t_maitred;
+
+int				check_arguments(int argc, char **argv);
+int				seat_philosophers(t_maitred *maitre_d);
+int				assign_data(t_maitred *data, char **args);
+unsigned int	get_time(void);
+void			clean_table(t_maitred *maitre_d);
+t_bool			check_stopper(t_philo *philo, int i);
+void			*routines(void *arg);
+unsigned int	oversee_helper(t_philo *philo, int i);
+void			*oversee(void *maitre_d);
+int 			destroy_mutexes(t_maitred *maitre_d, int i, int mutexnumber);
+
+
 
 #endif
