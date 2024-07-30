@@ -25,7 +25,9 @@ static void	print_message(t_philo *philo, int i, unsigned int time)
 	else if (i == 3 && philo->data->death == FALSE)
 	{
 		printf("%d %d is eating\n", time, philo->index);
+		pthread_mutex_lock(&philo->mealtdata);
 		philo->last_meal = time;
+		pthread_mutex_unlock(&philo->mealtdata);
 	}
 	else if (i == 4 && philo->data->death == FALSE)
 		printf("%d %d is sleeping\n", timestamp, philo->index);
